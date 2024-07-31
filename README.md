@@ -6,7 +6,7 @@
 
 ## Architecture
 
-![Architecture .png](Architecture%20.png)
+![Architecture.png](Architecture%20.png)
 
 ## Structure
 
