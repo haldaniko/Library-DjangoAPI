@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     "drf_spectacular",
     "books_service",
+    "borrowing_service",
     "user",
 ]
 
