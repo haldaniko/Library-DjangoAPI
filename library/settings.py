@@ -133,7 +133,6 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "AUTH_HEADER_NAME": "HTTP_AUTHORIZE",
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
