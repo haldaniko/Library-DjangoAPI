@@ -1,3 +1,4 @@
+from django.db.transaction import atomic
 from rest_framework import serializers
 
 from books_service.serializers import BookSerializer
@@ -11,15 +12,50 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = ("status", "payment_type", "borrowing", "session_url", "session_id", "money_to_pay")
 
 
-class BorrowingSerializer(serializers.ModelSerializer):
+class BorrowingCreateSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Borrowing
-        fields = ("borrow_date", "expected_return_date", "actual_return_date", "book", "user")
+        fields = ("id", "book", "expected_return_date")
+
+    def validate(self, attrs):
+        data = super(BorrowingCreateSerializer, self).validate(attrs)
+
+        Borrowing.validate_borrowing(
+            attrs["book"].inventory,
+            serializers.ValidationError
+        )
+        return data
+
+    @atomic
+    def create(self, validated_data):
+
+        print("---->", self.context["request"].user)
+
+        book = validated_data["book"]
+        expected_return_date = validated_data["expected_return_date"]
+
+        borrowing = Borrowing.objects.create(
+            user=self.context["request"].user,
+            book=book,
+            expected_return_date=expected_return_date,
+        )
+
+        book.inventory -= 1
+        book.save()
+
+        return borrowing
 
 
 class BorrowingListSerializer(serializers.ModelSerializer):
-    book = serializers.StringRelatedField()
-    user = serializers.StringRelatedField()
+    book = serializers.CharField(
+        read_only=True,
+        source="book.title"
+    )
+    user = serializers.CharField(
+        read_only=True,
+        source="user.email"
+    )
 
     class Meta:
         model = Borrowing
