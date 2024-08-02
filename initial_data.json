@@ -1,0 +1,226 @@
+[
+  {
+    "model": "user.user",
+    "pk": 1,
+    "fields": {
+      "password": "password123",
+      "first_name": "User",
+      "last_name": "One",
+      "email": "user1@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "is_superuser": false,
+      "last_login": null,
+      "date_joined": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 2,
+    "fields": {
+      "password": "password123",
+      "first_name": "User",
+      "last_name": "Two",
+      "email": "user2@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "is_superuser": false,
+      "last_login": null,
+      "date_joined": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 3,
+    "fields": {
+      "password": "password123",
+      "first_name": "User",
+      "last_name": "Three",
+      "email": "user3@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "is_superuser": false,
+      "last_login": null,
+      "date_joined": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books_service.book",
+    "pk": 1,
+    "fields": {
+      "title": "Book One",
+      "author": "Author A",
+      "cover": "HARD",
+      "inventory": 10,
+      "daily_fee": "1.50"
+    }
+  },
+  {
+    "model": "books_service.book",
+    "pk": 2,
+    "fields": {
+      "title": "Book Two",
+      "author": "Author B",
+      "cover": "SOFT",
+      "inventory": 5,
+      "daily_fee": "2.00"
+    }
+  },
+  {
+    "model": "books_service.book",
+    "pk": 3,
+    "fields": {
+      "title": "Book Three",
+      "author": "Author C",
+      "cover": "HARD",
+      "inventory": 8,
+      "daily_fee": "1.75"
+    }
+  },
+  {
+    "model": "books_service.book",
+    "pk": 4,
+    "fields": {
+      "title": "Book Four",
+      "author": "Author D",
+      "cover": "SOFT",
+      "inventory": 7,
+      "daily_fee": "2.50"
+    }
+  },
+  {
+    "model": "books_service.book",
+    "pk": 5,
+    "fields": {
+      "title": "Book Five",
+      "author": "Author E",
+      "cover": "HARD",
+      "inventory": 3,
+      "daily_fee": "1.90"
+    }
+  },
+  {
+    "model": "books_service.book",
+    "pk": 6,
+    "fields": {
+      "title": "Book Six",
+      "author": "Author F",
+      "cover": "SOFT",
+      "inventory": 6,
+      "daily_fee": "2.10"
+    }
+  },
+  {
+    "model": "books_service.book",
+    "pk": 7,
+    "fields": {
+      "title": "Book Seven",
+      "author": "Author G",
+      "cover": "HARD",
+      "inventory": 4,
+      "daily_fee": "1.80"
+    }
+  },
+  {
+    "model": "books_service.book",
+    "pk": 8,
+    "fields": {
+      "title": "Book Eight",
+      "author": "Author H",
+      "cover": "SOFT",
+      "inventory": 2,
+      "daily_fee": "2.20"
+    }
+  },
+  {
+    "model": "books_service.book",
+    "pk": 9,
+    "fields": {
+      "title": "Book Nine",
+      "author": "Author I",
+      "cover": "HARD",
+      "inventory": 9,
+      "daily_fee": "2.00"
+    }
+  },
+  {
+    "model": "books_service.book",
+    "pk": 10,
+    "fields": {
+      "title": "Book Ten",
+      "author": "Author J",
+      "cover": "SOFT",
+      "inventory": 1,
+      "daily_fee": "2.50"
+    }
+  },
+  {
+    "model": "borrowing_service.borrowing",
+    "pk": 1,
+    "fields": {
+      "borrow_date": "2024-07-01",
+      "expected_return_date": "2024-07-10",
+      "actual_return_date": null,
+      "book": 1,
+      "user": 1
+    }
+  },
+  {
+    "model": "borrowing_service.borrowing",
+    "pk": 2,
+    "fields": {
+      "borrow_date": "2024-07-05",
+      "expected_return_date": "2024-07-15",
+      "actual_return_date": null,
+      "book": 2,
+      "user": 2
+    }
+  },
+  {
+    "model": "borrowing_service.borrowing",
+    "pk": 3,
+    "fields": {
+      "borrow_date": "2024-07-10",
+      "expected_return_date": "2024-07-20",
+      "actual_return_date": null,
+      "book": 3,
+      "user": 3
+    }
+  },
+  {
+    "model": "borrowing_service.payment",
+    "pk": 1,
+    "fields": {
+      "status": "PENDING",
+      "payment_type": "PAYMENT",
+      "borrowing": 1,
+      "session_url": "http://example.com/session/1",
+      "session_id": "session_1",
+      "money_to_pay": "15.00"
+    }
+  },
+  {
+    "model": "borrowing_service.payment",
+    "pk": 2,
+    "fields": {
+      "status": "PAID",
+      "payment_type": "FINE",
+      "borrowing": 2,
+      "session_url": "http://example.com/session/2",
+      "session_id": "session_2",
+      "money_to_pay": "20.00"
+    }
+  },
+  {
+    "model": "borrowing_service.payment",
+    "pk": 3,
+    "fields": {
+      "status": "PENDING",
+      "payment_type": "PAYMENT",
+      "borrowing": 3,
+      "session_url": "http://example.com/session/3",
+      "session_id": "session_3",
+      "money_to_pay": "18.00"
+    }
+  }
+]
