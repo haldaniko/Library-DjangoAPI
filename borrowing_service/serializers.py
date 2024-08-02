@@ -34,6 +34,9 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
         book = validated_data["book"]
         expected_return_date = validated_data["expected_return_date"]
 
+        if book.inventory <= 0:
+            raise serializers.ValidationError({"book": "Book inventory is zero. Cannot borrow this book."})
+
         borrowing = Borrowing.objects.create(
             user=self.context["request"].user,
             book=book,
@@ -74,7 +77,7 @@ class BorrowingDetailSerializer(serializers.ModelSerializer):
 class BorrowingReturnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Borrowing
-        fields = ['actual_return_date']
+        fields = ['id']
 
     def validate(self, attrs):
         data = super(BorrowingReturnSerializer, self).validate(attrs)
@@ -87,3 +90,10 @@ class BorrowingReturnSerializer(serializers.ModelSerializer):
                 }
             )
         return data
+
+    @atomic
+    def update(self, instance, validated_data):
+        instance.actual_return_date = datetime.today().date()
+        instance.return_book()
+        instance.save()
+        return instance
