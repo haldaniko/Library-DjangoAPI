@@ -1,4 +1,5 @@
 from rest_framework import viewsets, status, generics
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from .models import Borrowing, Payment
 from .serializers import (
@@ -14,13 +15,17 @@ class BorrowingViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user_id = self.request.query_params.get('user_id')
         is_active = self.request.query_params.get('is_active')
-
+        user = self.request.user
         queryset = self.queryset
 
+        if not user.is_authenticated:
+            raise PermissionDenied("You must be logged in to view this data.")
+        if not user.is_staff:
+            queryset = queryset.filter(user=user)
         if user_id:
             queryset = queryset.filter(user_id=user_id)
-        if is_active:
-            queryset = queryset.filter(is_active=is_active.lower() == 'true')
+        if is_active and is_active.lower() == "true":
+            queryset = queryset.filter(actual_return_date=None)
 
         return queryset.distinct()
 
