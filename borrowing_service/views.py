@@ -2,15 +2,14 @@ from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 from .models import Borrowing, Payment
 from .serializers import (
-    BorrowingSerializer,
     BorrowingReturnSerializer,
-    PaymentSerializer, BorrowingDetailSerializer, BorrowingListSerializer,
+    PaymentSerializer, BorrowingDetailSerializer, BorrowingListSerializer, BorrowingCreateSerializer,
 )
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
     queryset = Borrowing.objects.all()
-    serializer_class = BorrowingSerializer
+    serializer_class = BorrowingCreateSerializer
 
     def get_queryset(self):
         user_id = self.request.query_params.get('user_id')
@@ -30,7 +29,20 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             return BorrowingListSerializer
         if self.action == "retrieve":
             return BorrowingDetailSerializer
-        return BorrowingSerializer
+        return BorrowingCreateSerializer
+
+    def create(self, request, *args, **kwargs) -> Response:
+        user = self.request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        borrowing = serializer.save(user=user)
+
+        return Response(
+            {
+                "detail": "Borrowing created successfully",
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class BorrowingReturnAPIView(generics.UpdateAPIView):
