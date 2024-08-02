@@ -1,3 +1,6 @@
+from datetime import date
+from decimal import Decimal
+
 from django.db import models
 from django.core.validators import MinValueValidator
 
@@ -14,6 +17,39 @@ class Borrowing(models.Model):
 
     def __str__(self):
         return f"{self.user} borrowed {self.book} on {self.borrow_date}"
+
+    @staticmethod
+    def validate_borrowing(
+            inventory,
+            error_to_raise
+    ) -> None:
+        if inventory == 0:
+            raise error_to_raise(
+                {"book": "Book inventory is zero. Cannot borrow this book."}
+            )
+
+    def clean(self) -> None:
+        Borrowing.validate_borrowing(
+            self.book.inventory,
+            ValueError
+        )
+
+    def save(self, *args, **kwargs) -> None:
+        self.clean()
+        return super().save(*args, **kwargs)
+
+    def return_book(self) -> None:
+        self.actual_return_date = date.today()
+        self.book.inventory += 1
+        self.book.save()
+        self.save()
+
+    def calculate_total_fee(self) -> Decimal:
+        end_date = self.expected_return_date
+        total_days = (end_date - self.borrow_date).days
+        total_fee = Decimal(total_days) * self.book.daily_fee
+
+        return total_fee
 
 
 class Payment(models.Model):
