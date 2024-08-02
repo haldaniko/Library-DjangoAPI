@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db.transaction import atomic
 from rest_framework import serializers
 
@@ -29,15 +31,13 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
 
     @atomic
     def create(self, validated_data):
-
-        print("---->", self.context["request"].user)
-
         book = validated_data["book"]
         expected_return_date = validated_data["expected_return_date"]
 
         borrowing = Borrowing.objects.create(
             user=self.context["request"].user,
             book=book,
+            borrow_date=datetime.now(),
             expected_return_date=expected_return_date,
         )
 
