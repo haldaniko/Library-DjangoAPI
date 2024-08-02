@@ -1,10 +1,11 @@
 from rest_framework import viewsets, status, generics
-from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from .models import Borrowing, Payment
-from .serializers import BorrowingSerializer, BorrowingReturnSerializer, PaymentSerializer
+from .serializers import (
+    BorrowingSerializer,
+    BorrowingReturnSerializer,
+    PaymentSerializer, BorrowingDetailSerializer, BorrowingListSerializer,
+)
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
@@ -23,6 +24,13 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(is_active=is_active.lower() == 'true')
 
         return queryset.distinct()
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return BorrowingListSerializer
+        if self.action == "retrieve":
+            return BorrowingDetailSerializer
+        return BorrowingSerializer
 
 
 class BorrowingReturnAPIView(generics.UpdateAPIView):
