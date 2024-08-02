@@ -27,8 +27,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 INTERNAL_IPS = [
-    'localhost',
     '127.0.0.1',
+    '::1',
 ]
 
 INSTALLED_APPS = [
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     "drf_spectacular",
     "books_service",
+    "borrowing_service",
     "user",
 ]
 
