@@ -260,3 +260,8 @@ fabric.properties
 !.idea/runConfigurations
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all,django
+
+# Celery
+celerybeat-schedule.dat
+celerybeat-schedule.bak
+celerybeat-schedule.dir
