@@ -14,6 +14,8 @@ def check_overdue_borrowings():
         for borrowing in overdue_borrowings:
             send_telegram_notification(borrowing)
         return f"{len(overdue_borrowings)} overdue borrowings notified."
+    else:
+        send_message("No borrowings overdue today")
     return "No borrowings overdue today"
 
 
