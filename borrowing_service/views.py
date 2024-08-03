@@ -41,10 +41,10 @@ class BorrowingViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         book = serializer.validated_data['book']
         expected_return_date = serializer.validated_data['expected_return_date']
         user = self.request.user
+        serializer.save(user=user)
 
         message = (
             f"📚 Book Borrowing Details\n\n"
