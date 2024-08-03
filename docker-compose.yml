@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+    # Django Service
+    app:
+      restart: always
+      build:
+        context: .
+      ports:
+        - "8000:8000"
+      volumes:
+        - ./:/app
+      command: >
+        sh -c "python manage.py migrate &&
+              python manage.py runserver 0.0.0.0:8000"
+      env_file:
+        - .env
+      depends_on:
+        - redis
+
+    # Redis Service
+    redis:
+        image: "redis:alpine"
+        ports:
+          - "6379:6379"
+
+    # Celery Service
+    celery:
+      restart: on-failure
+      build:
+        context: .
+        dockerfile: Dockerfile
+      command: >
+        sh -c "celery -A library worker -l INFO"
+      env_file:
+        - .env
+      depends_on:
+        - redis
+        - app
+
+    # Celery Beat
+    beat:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      command: >
+        sh -c "celery -A library beat -l INFO"
+      env_file:
+        - .env
+      depends_on:
+        - redis
+        - celery
+
+    # Flower
+    flower:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      ports:
+        - "5555:5555"
+      command: >
+        sh -c "celery -A library flower --address=0.0.0.0"
+      depends_on:
+        - celery
+      env_file:
+        - .env
+
