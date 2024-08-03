@@ -1,6 +1,8 @@
 from rest_framework import viewsets, status, generics
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+
+from .helpers.telegram import send_message
 from .models import Borrowing, Payment
 from .serializers import (
     BorrowingReturnSerializer,
@@ -37,10 +39,21 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         return BorrowingCreateSerializer
 
     def create(self, request, *args, **kwargs) -> Response:
-        user = self.request.user
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        borrowing = serializer.save(user=user)
+
+        book = serializer.validated_data['book']
+        expected_return_date = serializer.validated_data['expected_return_date']
+        user = self.request.user
+
+        message = (
+            f"📚 Book Borrowing Details\n\n"
+            f"User: {user.first_name} {user.last_name}\n" 
+            f"Book Title: {book.title}\n"
+            f"Author: {book.author}\n"
+            f"Expected Return Date: {expected_return_date}\n"
+        )
+        send_message(message)
 
         return Response(
             {
