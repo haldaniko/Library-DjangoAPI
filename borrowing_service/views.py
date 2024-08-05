@@ -1,7 +1,9 @@
 from rest_framework import viewsets, status, generics
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from books_service.permissions import IsAdminOrReadOnly
 from .helpers.telegram import send_message
 from .models import Borrowing, Payment
 from .serializers import (
@@ -90,3 +92,16 @@ class BorrowingReturnAPIView(generics.UpdateAPIView):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
+    authentication_classes = (JWTAuthentication,)
+    permission_classes = (IsAdminOrReadOnly,)
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = self.queryset
+
+        if not user.is_authenticated:
+            raise PermissionDenied("You must be logged in to view this data.")
+        if not user.is_staff:
+            queryset = queryset.filter(borrowing__user=user)
+        return queryset.distinct()
+
