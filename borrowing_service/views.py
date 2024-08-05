@@ -1,14 +1,16 @@
-from rest_framework import viewsets, status, generics
-from rest_framework.exceptions import PermissionDenied
+from rest_framework import viewsets, status, generics, mixins
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.views import APIView
 
-from books_service.permissions import IsAdminOrReadOnly
+from .helpers.payment import create_payment_session
 from .helpers.telegram import send_message
 from .models import Borrowing, Payment
 from .serializers import (
     BorrowingReturnSerializer,
     PaymentSerializer, BorrowingDetailSerializer, BorrowingListSerializer, BorrowingCreateSerializer,
+    PaymentDetailSerializer,
 )
 
 
@@ -46,7 +48,16 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         book = serializer.validated_data['book']
         expected_return_date = serializer.validated_data['expected_return_date']
         user = self.request.user
-        serializer.save(user=user)
+
+        pending_payments = Payment.objects.filter(
+            borrowing__user=user,
+            status="PENDING" or "EXPIRED"
+        )
+        if pending_payments:
+            raise ValidationError(
+                "You have pending/expired payments. "
+                "You cannot borrow new books until they are paid."
+            )
 
         message = (
             f"📚 Book Borrowing Details\n\n"
@@ -57,9 +68,20 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         )
         send_message(message)
 
+        borrowing = serializer.save(user=user)
+
+        total_fee = borrowing.calculate_total_fee()
+        create_payment_session(
+            self.request,
+            borrowing,
+            total_fee,
+            Payment.Type.PAYMENT.name
+        )
+        payment = Payment.objects.get(borrowing=borrowing)
         return Response(
             {
                 "detail": "Borrowing created successfully",
+                "stripe_session_url": payment.session_url
             },
             status=status.HTTP_201_CREATED,
         )
@@ -89,19 +111,72 @@ class BorrowingReturnAPIView(generics.UpdateAPIView):
         )
 
 
-class PaymentViewSet(viewsets.ModelViewSet):
+class PaymentViewSet(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
     queryset = Payment.objects.all().select_related()
-    serializer_class = PaymentSerializer
-    authentication_classes = (JWTAuthentication,)
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        user = self.request.user
         queryset = self.queryset
-
-        if not user.is_authenticated:
-            raise PermissionDenied("You must be logged in to view this data.")
+        user = self.request.user
         if not user.is_staff:
-            queryset = queryset.filter(borrowing__user=user)
-        return queryset.distinct()
+            return queryset.filter(borrowing__user=user)
+        return queryset
 
+    def get_serializer_class(self):
+        if self.action == "list":
+            return PaymentSerializer
+        return PaymentDetailSerializer
+
+
+class PaymentRenewalView(APIView):
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        payment = Payment.objects.filter(
+            status="EXPIRED", borrowing__user=user
+        ).first()
+        if payment:
+            new_session = create_payment_session(
+                self.request,
+                payment.borrowing,
+                payment.money_to_pay,
+                Payment.Type.PAYMENT.name
+            )
+
+            payment.status = new_session
+            payment.save()
+
+            return Response(
+                {
+                    "detail": "Payment session renewed.",
+                    "session_id": new_session.id,
+                    "session_url": new_session.url
+                }
+            )
+        return Response(
+            {"detail": "No expired payment session found for renewal."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+class PaymentSuccessView(APIView):
+    @staticmethod
+    def get(request, *args, **kwargs) -> Response:
+        session_id = request.query_params.get("session_id")
+        payment = Payment.objects.get(session_id=session_id)
+        payment.status = Payment.Status.PAID.name
+        payment.save()
+        return Response({"detail": "Payment succeeded!"})
+
+
+class PaymentCancelView(APIView):
+    @staticmethod
+    def get(request, *args, **kwargs) -> Response:
+        return Response(
+            {
+                "detail": "Your payment session is still "
+                "available for 24 hours. Please complete your "
+                "payment within this period."
+            }
+        )

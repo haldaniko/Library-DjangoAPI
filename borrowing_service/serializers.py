@@ -5,13 +5,8 @@ from rest_framework import serializers
 
 from books_service.serializers import BookSerializer
 from user.serializers import UserSerializer
+from .helpers.payment import create_payment_session
 from .models import Borrowing, Payment
-
-
-class PaymentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Payment
-        fields = ("id", "status", "payment_type", "borrowing", "session_url", "session_id", "money_to_pay")
 
 
 class BorrowingCreateSerializer(serializers.ModelSerializer):
@@ -92,8 +87,32 @@ class BorrowingReturnSerializer(serializers.ModelSerializer):
         return data
 
     @atomic
-    def update(self, instance, validated_data):
-        instance.actual_return_date = datetime.today().date()
-        instance.return_book()
-        instance.save()
-        return instance
+    def update(self, borrowing, validated_data):
+        borrowing.actual_return_date = datetime.today().date()
+        borrowing.return_book()
+        borrowing.save()
+        return borrowing
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    borrowing = serializers.CharField(source='borrowing.__str__', read_only=True)
+
+    class Meta:
+        model = Payment
+        fields = ("id", "status", "payment_type", "borrowing", "money_to_pay")
+
+
+class PaymentDetailSerializer(serializers.ModelSerializer):
+    borrowing = BorrowingDetailSerializer()
+
+    class Meta:
+        model = Payment
+        fields = (
+            "id",
+            "status",
+            "payment_type",
+            "borrowing",
+            "session_url",
+            "session_id",
+            "money_to_pay",
+        )
