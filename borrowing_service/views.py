@@ -90,7 +90,7 @@ class BorrowingReturnAPIView(generics.UpdateAPIView):
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
-    queryset = Payment.objects.all()
+    queryset = Payment.objects.all().select_related()
     serializer_class = PaymentSerializer
     authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAdminOrReadOnly,)
