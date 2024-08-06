@@ -20,20 +20,14 @@ class Borrowing(models.Model):
         return f"{self.user} borrowed {self.book} on {self.borrow_date}"
 
     @staticmethod
-    def validate_borrowing(
-            inventory,
-            error_to_raise
-    ) -> None:
+    def validate_borrowing(inventory, error_to_raise) -> None:
         if inventory == 0:
             raise error_to_raise(
                 {"book": "Book inventory is zero. Cannot borrow this book."}
             )
 
     def clean(self) -> None:
-        Borrowing.validate_borrowing(
-            self.book.inventory,
-            ValueError
-        )
+        Borrowing.validate_borrowing(self.book.inventory, ValueError)
 
     def save(self, *args, **kwargs) -> None:
         self.clean()
@@ -51,9 +45,7 @@ class Borrowing(models.Model):
         return total_fee
 
     def calculate_overdue_fee(self) -> Decimal:
-        overdue_days = (
-                self.actual_return_date - self.expected_return_date
-        ).days
+        overdue_days = (self.actual_return_date - self.expected_return_date).days
         daily_fee = self.book.daily_fee
         fine_multiplier = Decimal(getenv("FINE_MULTIPLIER"))
         overdue_fee = overdue_days * daily_fee * fine_multiplier
@@ -62,31 +54,27 @@ class Borrowing(models.Model):
 
 class Payment(models.Model):
     class Status(models.TextChoices):
-        PENDING = 'PENDING', 'Pending'
-        PAID = 'PAID', 'Paid'
+        PENDING = "PENDING", "Pending"
+        PAID = "PAID", "Paid"
 
     class Type(models.TextChoices):
-        PAYMENT = 'PAYMENT', 'Payment'
-        FINE = 'FINE', 'Fine'
+        PAYMENT = "PAYMENT", "Payment"
+        FINE = "FINE", "Fine"
 
     status = models.CharField(
-        max_length=10,
-        choices=Status.choices,
-        default=Status.PENDING
+        max_length=10, choices=Status.choices, default=Status.PENDING
     )
     payment_type = models.CharField(
-        max_length=10,
-        choices=Type.choices,
-        default=Type.PAYMENT
+        max_length=10, choices=Type.choices, default=Type.PAYMENT
     )
     borrowing = models.OneToOneField(Borrowing, on_delete=models.CASCADE)
     session_url = models.URLField(max_length=200)
     session_id = models.CharField(max_length=255)
     money_to_pay = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        validators=[MinValueValidator(0.01)]
+        max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)]
     )
 
     def __str__(self):
-        return f"Payment for {self.borrowing} - Status: {self.status}, Type: {self.payment_type}"
+        return (f"Borrowing:{self.borrowing}, "
+                f"Status: {self.status}', "
+                f"Type: {self.payment_type}")

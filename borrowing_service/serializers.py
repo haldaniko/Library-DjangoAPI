@@ -19,8 +19,7 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
         data = super(BorrowingCreateSerializer, self).validate(attrs)
 
         Borrowing.validate_borrowing(
-            attrs["book"].inventory,
-            serializers.ValidationError
+            attrs["book"].inventory, serializers.ValidationError
         )
         return data
 
@@ -30,7 +29,9 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
         expected_return_date = validated_data["expected_return_date"]
 
         if book.inventory <= 0:
-            raise serializers.ValidationError({"book": "Book inventory is zero. Cannot borrow this book."})
+            raise serializers.ValidationError(
+                {"book": "Book inventory is zero. Cannot borrow this book."}
+            )
 
         borrowing = Borrowing.objects.create(
             user=self.context["request"].user,
@@ -46,18 +47,19 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
 
 
 class BorrowingListSerializer(serializers.ModelSerializer):
-    book = serializers.CharField(
-        read_only=True,
-        source="book.title"
-    )
-    user = serializers.CharField(
-        read_only=True,
-        source="user.email"
-    )
+    book = serializers.CharField(read_only=True, source="book.title")
+    user = serializers.CharField(read_only=True, source="user.email")
 
     class Meta:
         model = Borrowing
-        fields = ("id", "borrow_date", "expected_return_date", "actual_return_date", "book", "user")
+        fields = (
+            "id",
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date",
+            "book",
+            "user",
+        )
 
 
 class BorrowingDetailSerializer(serializers.ModelSerializer):
@@ -66,13 +68,20 @@ class BorrowingDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Borrowing
-        fields = ("id", "borrow_date", "expected_return_date", "actual_return_date", "book", "user")
+        fields = (
+            "id",
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date",
+            "book",
+            "user",
+        )
 
 
 class BorrowingReturnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Borrowing
-        fields = ['id']
+        fields = ["id"]
 
     def validate(self, attrs):
         data = super(BorrowingReturnSerializer, self).validate(attrs)
@@ -93,7 +102,7 @@ class BorrowingReturnSerializer(serializers.ModelSerializer):
 
 
 class PaymentSerializer(serializers.ModelSerializer):
-    borrowing = serializers.CharField(source='borrowing.__str__', read_only=True)
+    borrowing = serializers.CharField(source="borrowing.__str__", read_only=True)
 
     class Meta:
         model = Payment

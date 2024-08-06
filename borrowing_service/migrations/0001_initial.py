@@ -11,32 +11,87 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('books_service', '0002_alter_book_unique_together'),
+        ("books_service", "0002_alter_book_unique_together"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Borrowing',
+            name="Borrowing",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('borrow_date', models.DateField()),
-                ('expected_return_date', models.DateField()),
-                ('actual_return_date', models.DateField(blank=True, null=True)),
-                ('book', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='books_service.book')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("borrow_date", models.DateField()),
+                ("expected_return_date", models.DateField()),
+                ("actual_return_date", models.DateField(blank=True, null=True)),
+                (
+                    "book",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="books_service.book",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Payment',
+            name="Payment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('PENDING', 'Pending'), ('PAID', 'Paid')], default='PENDING', max_length=10)),
-                ('payment_type', models.CharField(choices=[('PAYMENT', 'Payment'), ('FINE', 'Fine')], default='PAYMENT', max_length=10)),
-                ('session_url', models.URLField()),
-                ('session_id', models.CharField(max_length=255)),
-                ('money_to_pay', models.DecimalField(decimal_places=2, max_digits=10, validators=[django.core.validators.MinValueValidator(0.01)])),
-                ('borrowing', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='borrowing_service.borrowing')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[("PENDING", "Pending"), ("PAID", "Paid")],
+                        default="PENDING",
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "payment_type",
+                    models.CharField(
+                        choices=[("PAYMENT", "Payment"), ("FINE", "Fine")],
+                        default="PAYMENT",
+                        max_length=10,
+                    ),
+                ),
+                ("session_url", models.URLField()),
+                ("session_id", models.CharField(max_length=255)),
+                (
+                    "money_to_pay",
+                    models.DecimalField(
+                        decimal_places=2,
+                        max_digits=10,
+                        validators=[django.core.validators.MinValueValidator(0.01)],
+                    ),
+                ),
+                (
+                    "borrowing",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="borrowing_service.borrowing",
+                    ),
+                ),
             ],
         ),
     ]
