@@ -43,7 +43,6 @@ class Borrowing(models.Model):
         self.actual_return_date = date.today()
         self.book.inventory += 1
         self.book.save()
-        self.save()
 
     def calculate_total_fee(self) -> Decimal:
         total_days = (self.expected_return_date - self.borrow_date).days
@@ -52,12 +51,6 @@ class Borrowing(models.Model):
         return total_fee
 
     def calculate_overdue_fee(self) -> Decimal:
-        if not self.actual_return_date:
-            self.actual_return_date = datetime.today().date()
-
-        if self.actual_return_date <= self.expected_return_date:
-            return Decimal(0)
-
         overdue_days = (
                 self.actual_return_date - self.expected_return_date
         ).days
