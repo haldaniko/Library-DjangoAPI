@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, status, generics, mixins
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
@@ -33,8 +35,12 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(user=user)
         if user_id:
             queryset = queryset.filter(user_id=user_id)
-        if is_active and is_active.lower() == "true":
-            queryset = queryset.filter(actual_return_date=None)
+
+        is_active = self.request.query_params.get("is_active")
+
+        if is_active:
+            is_active = True if is_active.lower() == "true" else False
+            queryset = queryset.filter(is_active=is_active)
 
         return queryset.distinct()
 
@@ -84,6 +90,29 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_201_CREATED,
         )
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="user_id",
+                description=(
+                        "Filter by user ID"
+                ),
+                type=OpenApiTypes.INT,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="is_active",
+                description=(
+                        "Filter by borrowing status: [True] or [False] "
+                ),
+                type=OpenApiTypes.STR,
+                required=False,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class BorrowingReturnAPIView(generics.UpdateAPIView):
