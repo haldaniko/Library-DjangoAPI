@@ -9,7 +9,10 @@ from .helpers.telegram import send_message
 from .models import Borrowing, Payment
 from .serializers import (
     BorrowingReturnSerializer,
-    PaymentSerializer, BorrowingDetailSerializer, BorrowingListSerializer, BorrowingCreateSerializer,
+    PaymentSerializer,
+    BorrowingDetailSerializer,
+    BorrowingListSerializer,
+    BorrowingCreateSerializer,
     PaymentDetailSerializer,
 )
 
@@ -19,8 +22,8 @@ class BorrowingViewSet(viewsets.ModelViewSet):
     serializer_class = BorrowingCreateSerializer
 
     def get_queryset(self):
-        user_id = self.request.query_params.get('user_id')
-        is_active = self.request.query_params.get('is_active')
+        user_id = self.request.query_params.get("user_id")
+        is_active = self.request.query_params.get("is_active")
         user = self.request.user
         queryset = self.queryset
 
@@ -45,13 +48,12 @@ class BorrowingViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        book = serializer.validated_data['book']
-        expected_return_date = serializer.validated_data['expected_return_date']
+        book = serializer.validated_data["book"]
+        expected_return_date = serializer.validated_data["expected_return_date"]
         user = self.request.user
 
         pending_payments = Payment.objects.filter(
-            borrowing__user=user,
-            status="PENDING" or "EXPIRED"
+            borrowing__user=user, status="PENDING" or "EXPIRED"
         )
         if pending_payments:
             raise ValidationError(
@@ -61,7 +63,7 @@ class BorrowingViewSet(viewsets.ModelViewSet):
 
         message = (
             f"📚 Book Borrowing Details\n\n"
-            f"User: {user.first_name} {user.last_name}\n" 
+            f"User: {user.first_name} {user.last_name}\n"
             f"Book Title: {book.title}\n"
             f"Author: {book.author}\n"
             f"Expected Return Date: {expected_return_date}\n"
@@ -72,16 +74,13 @@ class BorrowingViewSet(viewsets.ModelViewSet):
 
         total_fee = borrowing.calculate_total_fee()
         create_payment_session(
-            self.request,
-            borrowing,
-            total_fee,
-            Payment.Type.PAYMENT.name
+            self.request, borrowing, total_fee, Payment.Type.PAYMENT.name
         )
         payment = Payment.objects.get(borrowing=borrowing)
         return Response(
             {
                 "detail": "Borrowing created successfully",
-                "stripe_session_url": payment.session_url
+                "stripe_session_url": payment.session_url,
             },
             status=status.HTTP_201_CREATED,
         )
@@ -92,30 +91,29 @@ class BorrowingReturnAPIView(generics.UpdateAPIView):
     serializer_class = BorrowingReturnSerializer
 
     def put(self, request, *args, **kwargs) -> Response:
-        serializer = self.get_serializer(self.get_object(), data=request.data, partial=True)
+        serializer = self.get_serializer(
+            self.get_object(), data=request.data, partial=True
+        )
         serializer.is_valid(raise_exception=True)
         borrowing = serializer.save()
 
         if borrowing.actual_return_date > borrowing.expected_return_date:
             total_fee = borrowing.calculate_overdue_fee()
             payment = create_payment_session(
-                self.request,
-                borrowing,
-                total_fee,
-                Payment.Type.PAYMENT.name
+                self.request, borrowing, total_fee, Payment.Type.PAYMENT.name
             )
             return Response(
                 {
                     "detail": "Borrowing updated and book inventory increased.",
                     "fine": f"The book return period has expired. You have to pay fine: {total_fee}",
-                    "stripe_session_url": payment.session_url
-                 },
-                status=status.HTTP_200_OK
+                    "stripe_session_url": payment.session_url,
+                },
+                status=status.HTTP_200_OK,
             )
 
         return Response(
             {"detail": "Borrowing updated and book inventory increased."},
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
 
@@ -141,15 +139,13 @@ class PaymentViewSet(
 class PaymentRenewalView(APIView):
     def post(self, request, *args, **kwargs):
         user = self.request.user
-        payment = Payment.objects.filter(
-            status="EXPIRED", borrowing__user=user
-        ).first()
+        payment = Payment.objects.filter(status="EXPIRED", borrowing__user=user).first()
         if payment:
             new_session = create_payment_session(
                 self.request,
                 payment.borrowing,
                 payment.money_to_pay,
-                Payment.Type.PAYMENT.name
+                Payment.Type.PAYMENT.name,
             )
 
             payment.status = new_session
@@ -159,12 +155,12 @@ class PaymentRenewalView(APIView):
                 {
                     "detail": "Payment session renewed.",
                     "session_id": new_session.id,
-                    "session_url": new_session.url
+                    "session_url": new_session.url,
                 }
             )
         return Response(
             {"detail": "No expired payment session found for renewal."},
-            status=status.HTTP_404_NOT_FOUND
+            status=status.HTTP_404_NOT_FOUND,
         )
 
 
