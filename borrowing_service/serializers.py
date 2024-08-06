@@ -88,9 +88,7 @@ class BorrowingReturnSerializer(serializers.ModelSerializer):
 
     @atomic
     def update(self, borrowing, validated_data):
-        borrowing.actual_return_date = datetime.today().date()
         borrowing.return_book()
-        borrowing.save()
         return borrowing
 
 
