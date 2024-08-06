@@ -92,22 +92,30 @@ class BorrowingReturnAPIView(generics.UpdateAPIView):
     serializer_class = BorrowingReturnSerializer
 
     def put(self, request, *args, **kwargs) -> Response:
-        borrowing = self.get_object()
-        serializer = self.get_serializer(
-            borrowing,
-            data=request.data,
-            partial=True
-        )
+        serializer = self.get_serializer(self.get_object(), data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         borrowing = serializer.save()
-        return_date = serializer.validated_data.get('return_date')
-        if return_date:
-            borrowing.return_date = return_date
-            borrowing.save()
+
+        if borrowing.actual_return_date > borrowing.expected_return_date:
+            total_fee = borrowing.calculate_overdue_fee()
+            payment = create_payment_session(
+                self.request,
+                borrowing,
+                total_fee,
+                Payment.Type.PAYMENT.name
+            )
+            return Response(
+                {
+                    "detail": "Borrowing updated and book inventory increased.",
+                    "fine": f"The book return period has expired. You have to pay fine: {total_fee}",
+                    "stripe_session_url": payment.session_url
+                 },
+                status=status.HTTP_200_OK
+            )
 
         return Response(
             {"detail": "Borrowing updated and book inventory increased."},
-            status=status.HTTP_200_OK,
+            status=status.HTTP_200_OK
         )
 
 
