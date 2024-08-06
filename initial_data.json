@@ -3,10 +3,10 @@
     "model": "user.user",
     "pk": 1,
     "fields": {
-      "password": "password123",
-      "first_name": "User",
-      "last_name": "One",
-      "email": "user1@example.com",
+      "password": "securePass!2024",
+      "first_name": "Alice",
+      "last_name": "Smith",
+      "email": "alice.smith@example.com",
       "is_staff": false,
       "is_active": true,
       "is_superuser": false,
@@ -18,10 +18,10 @@
     "model": "user.user",
     "pk": 2,
     "fields": {
-      "password": "password123",
-      "first_name": "User",
-      "last_name": "Two",
-      "email": "user2@example.com",
+      "password": "securePass!2024",
+      "first_name": "Bob",
+      "last_name": "Johnson",
+      "email": "bob.johnson@example.com",
       "is_staff": false,
       "is_active": true,
       "is_superuser": false,
@@ -33,10 +33,10 @@
     "model": "user.user",
     "pk": 3,
     "fields": {
-      "password": "password123",
-      "first_name": "User",
-      "last_name": "Three",
-      "email": "user3@example.com",
+      "password": "securePass!2024",
+      "first_name": "Charlie",
+      "last_name": "Williams",
+      "email": "charlie.williams@example.com",
       "is_staff": false,
       "is_active": true,
       "is_superuser": false,
@@ -48,8 +48,8 @@
     "model": "books_service.book",
     "pk": 1,
     "fields": {
-      "title": "Book One",
-      "author": "Author A",
+      "title": "The Great Adventure",
+      "author": "Emily Carter",
       "cover": "HARD",
       "inventory": 10,
       "daily_fee": "1.50"
@@ -59,8 +59,8 @@
     "model": "books_service.book",
     "pk": 2,
     "fields": {
-      "title": "Book Two",
-      "author": "Author B",
+      "title": "Mystery at the Manor",
+      "author": "James Turner",
       "cover": "SOFT",
       "inventory": 5,
       "daily_fee": "2.00"
@@ -70,8 +70,8 @@
     "model": "books_service.book",
     "pk": 3,
     "fields": {
-      "title": "Book Three",
-      "author": "Author C",
+      "title": "Journey Through Time",
+      "author": "Linda Green",
       "cover": "HARD",
       "inventory": 8,
       "daily_fee": "1.75"
@@ -81,8 +81,8 @@
     "model": "books_service.book",
     "pk": 4,
     "fields": {
-      "title": "Book Four",
-      "author": "Author D",
+      "title": "The Lost Kingdom",
+      "author": "Michael Adams",
       "cover": "SOFT",
       "inventory": 7,
       "daily_fee": "2.50"
@@ -92,8 +92,8 @@
     "model": "books_service.book",
     "pk": 5,
     "fields": {
-      "title": "Book Five",
-      "author": "Author E",
+      "title": "Secrets of the Deep",
+      "author": "Natalie Lee",
       "cover": "HARD",
       "inventory": 3,
       "daily_fee": "1.90"
@@ -103,8 +103,8 @@
     "model": "books_service.book",
     "pk": 6,
     "fields": {
-      "title": "Book Six",
-      "author": "Author F",
+      "title": "The Hidden City",
+      "author": "Oscar Martinez",
       "cover": "SOFT",
       "inventory": 6,
       "daily_fee": "2.10"
@@ -114,8 +114,8 @@
     "model": "books_service.book",
     "pk": 7,
     "fields": {
-      "title": "Book Seven",
-      "author": "Author G",
+      "title": "Echoes of the Past",
+      "author": "Patricia Wilson",
       "cover": "HARD",
       "inventory": 4,
       "daily_fee": "1.80"
@@ -125,8 +125,8 @@
     "model": "books_service.book",
     "pk": 8,
     "fields": {
-      "title": "Book Eight",
-      "author": "Author H",
+      "title": "A New Dawn",
+      "author": "Quincy Brown",
       "cover": "SOFT",
       "inventory": 2,
       "daily_fee": "2.20"
@@ -136,8 +136,8 @@
     "model": "books_service.book",
     "pk": 9,
     "fields": {
-      "title": "Book Nine",
-      "author": "Author I",
+      "title": "The Final Frontier",
+      "author": "Rebecca Harris",
       "cover": "HARD",
       "inventory": 9,
       "daily_fee": "2.00"
@@ -147,8 +147,8 @@
     "model": "books_service.book",
     "pk": 10,
     "fields": {
-      "title": "Book Ten",
-      "author": "Author J",
+      "title": "Whispers in the Wind",
+      "author": "Steven Clark",
       "cover": "SOFT",
       "inventory": 1,
       "daily_fee": "2.50"
@@ -194,7 +194,7 @@
       "status": "PENDING",
       "payment_type": "PAYMENT",
       "borrowing": 1,
-      "session_url": "http://example.com/session/1",
+      "session_url": "http://librarysystem.com/session/1",
       "session_id": "session_1",
       "money_to_pay": "15.00"
     }
@@ -206,7 +206,7 @@
       "status": "PAID",
       "payment_type": "FINE",
       "borrowing": 2,
-      "session_url": "http://example.com/session/2",
+      "session_url": "http://librarysystem.com/session/2",
       "session_id": "session_2",
       "money_to_pay": "20.00"
     }
@@ -218,7 +218,7 @@
       "status": "PENDING",
       "payment_type": "PAYMENT",
       "borrowing": 3,
-      "session_url": "http://example.com/session/3",
+      "session_url": "http://librarysystem.com/session/3",
       "session_id": "session_3",
       "money_to_pay": "18.00"
     }
