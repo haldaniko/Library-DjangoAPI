@@ -1,5 +1,6 @@
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
+from os import getenv
 
 from django.db import models
 from django.core.validators import MinValueValidator
@@ -9,7 +10,7 @@ from user.models import User
 
 
 class Borrowing(models.Model):
-    borrow_date = models.DateField()
+    borrow_date = models.DateField(auto_now_add=True)
     expected_return_date = models.DateField()
     actual_return_date = models.DateField(null=True, blank=True)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
@@ -42,14 +43,21 @@ class Borrowing(models.Model):
         self.actual_return_date = date.today()
         self.book.inventory += 1
         self.book.save()
-        self.save()
 
     def calculate_total_fee(self) -> Decimal:
-        end_date = self.expected_return_date
-        total_days = (end_date - self.borrow_date).days
+        total_days = (self.expected_return_date - self.borrow_date).days
         total_fee = Decimal(total_days) * self.book.daily_fee
 
         return total_fee
+
+    def calculate_overdue_fee(self) -> Decimal:
+        overdue_days = (
+                self.actual_return_date - self.expected_return_date
+        ).days
+        daily_fee = self.book.daily_fee
+        fine_multiplier = Decimal(getenv("FINE_MULTIPLIER"))
+        overdue_fee = overdue_days * daily_fee * fine_multiplier
+        return overdue_fee
 
 
 class Payment(models.Model):
