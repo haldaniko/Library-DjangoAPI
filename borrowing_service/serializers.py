@@ -89,7 +89,8 @@ class BorrowingReturnSerializer(serializers.ModelSerializer):
         if borrowing.actual_return_date:
             raise serializers.ValidationError(
                 {
-                    f"Borrowing with id: {borrowing.id}": "This borrowing has already been returned."
+                    f"Borrowing with id: {borrowing.id}":
+                        "This borrowing has already been returned."
                 }
             )
         return data

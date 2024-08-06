@@ -105,7 +105,8 @@ class BorrowingReturnAPIView(generics.UpdateAPIView):
             return Response(
                 {
                     "detail": "Borrowing updated and book inventory increased.",
-                    "fine": f"The book return period has expired. You have to pay fine: {total_fee}",
+                    "fine": f"The book return period has expired. "
+                            f"You have to pay fine: {total_fee}",
                     "stripe_session_url": payment.session_url,
                 },
                 status=status.HTTP_200_OK,
@@ -139,7 +140,9 @@ class PaymentViewSet(
 class PaymentRenewalView(APIView):
     def post(self, request, *args, **kwargs):
         user = self.request.user
-        payment = Payment.objects.filter(status="EXPIRED", borrowing__user=user).first()
+        payment = Payment.objects.filter(
+            status="EXPIRED",
+            borrowing__user=user).first()
         if payment:
             new_session = create_payment_session(
                 self.request,

@@ -12,7 +12,12 @@ def build_absolute_url(request, url_name):
     return request.build_absolute_uri(relative_url)
 
 
-def create_payment_session(request: HttpRequest, borrowing, amount, payment_type):
+def create_payment_session(
+        request: HttpRequest,
+        borrowing,
+        amount,
+        payment_type
+):
     session = stripe.checkout.Session.create(
         payment_method_types=["card"],
         line_items=[
@@ -20,7 +25,7 @@ def create_payment_session(request: HttpRequest, borrowing, amount, payment_type
                 "price_data": {
                     "currency": "usd",
                     "product_data": {
-                        "name": f"{payment_type} fee for " f"{borrowing.book.title}",
+                        "name": f"{payment_type} fee for {borrowing.book.title}",
                     },
                     "unit_amount": int(amount * 100),
                 },
