@@ -4,11 +4,11 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from borrowing_service.models import Borrowing
+from borrowing_service.models import Borrowing, Payment
 from books_service.tests import sample_book
 
-
 BORROWINGS_URL = reverse("borrowing_service:borrowing-list")
+PAYMENTS_LIST = reverse("borrowing_service:payment-list")
 
 
 def sample_borrowing(**kwargs) -> Borrowing:
@@ -32,6 +32,24 @@ def sample_borrowing(**kwargs) -> Borrowing:
 
 def detail_borrowing_url(borrowing_id: int):
     return reverse("borrowing_service:borrowing-detail", kwargs={"pk": borrowing_id})
+
+
+def sample_payment(borrowing=None, **kwargs) -> Payment:
+
+    defaults = {
+        "session_url": "http://example.com",
+        "session_id": "sess_123456789",
+        "money_to_pay": 10.00,
+        "payment_type": Payment.Type.PAYMENT.name,
+        "status": Payment.Status.PAID.name,
+        "borrowing": borrowing,
+    }
+    defaults.update(kwargs)
+    return Payment.objects.create(**defaults)
+
+
+def detail_payment_url(payment_id: int):
+    return reverse("borrowing_service:payment-detail", kwargs={"pk": payment_id})
 
 
 class UnauthenticatedUserBorrowingsTestView(APITestCase):
@@ -64,7 +82,6 @@ class AdminUserBorrowingsTestView(APITestCase):
 
     def test_admin_borrowing_list(self):
         sample_borrowing(user=self.user)
-        print(BORROWINGS_URL)
         response = self.client.get(BORROWINGS_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -73,3 +90,41 @@ class AdminUserBorrowingsTestView(APITestCase):
         url = detail_borrowing_url(borrowing.id)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class UnauthenticatedUserPaymentTestView(APITestCase):
+    def setUp(self) -> None:
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            email="user@test.com",
+            password="testpassword"
+        )
+
+    def test_unauth_payment_list(self):
+        borrowing: Borrowing = sample_borrowing(user=self.user)
+        sample_payment(borrowing=borrowing)
+        response = self.client.get(PAYMENTS_LIST)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class AuthenticatedUserPaymentTestView(APITestCase):
+    def setUp(self) -> None:
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            email="user@example.com",
+            password="userpassword"
+        )
+        self.user_2 = get_user_model().objects.create_user(
+            email="user2@example.com",
+            password="user2password"
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_have_not_access_to_all_payments(self) -> None:
+        borrowing = sample_borrowing(user=self.user_2)
+        payment = sample_payment(borrowing=borrowing)
+
+        response = self.client.get(PAYMENTS_LIST)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(detail_payment_url(payment.id))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
