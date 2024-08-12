@@ -21,7 +21,6 @@ urlpatterns = [
         BorrowingReturnAPIView.as_view(),
         name="borrowing-return",
     ),
-    path("payments/", include(router.urls)),
     path("payments/renew/", PaymentRenewalView.as_view(), name="payment-renewal"),
     path("payment/success/", PaymentSuccessView.as_view(), name="payment-success"),
     path("payment/cancel/", PaymentCancelView.as_view(), name="payment-cancel"),
