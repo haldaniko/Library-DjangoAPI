@@ -7,7 +7,7 @@ Features include book CRUD operations, user authentication, borrowing tracking, 
 ## Instalation
 ```
 git clone `https://github.com/haldaniko/Library-service.git`
-cd library-service
+cd Library-service
 ```
 - Copy .env.sample to .env and populate it with all required data.
 ```
