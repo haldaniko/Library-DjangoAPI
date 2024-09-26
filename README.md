@@ -59,3 +59,6 @@ The API will be available at `http://127.0.0.1:8000/`
 ## Structure
 
 ![structure.png](structure.png)
+
+## Demo
+![demo.png](demo.png)
