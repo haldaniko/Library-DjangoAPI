@@ -43,7 +43,7 @@ pip install -r requirements.txt
 (Copy .env.sample to .env and populate it with all required data.)
 
 python manage.py migrate
-python manage.py loaddata newspapers_db_data.json
+python manage.py loaddata initial_data.json
 python manage.py runserver
 
 (Create new admin user)
