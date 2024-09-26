@@ -62,3 +62,5 @@ The API will be available at `http://127.0.0.1:8000/`
 
 ## Demo
 ![demo.png](demo.png)
+---
+![demo2.png](demo2.png)
