@@ -1,8 +1,13 @@
 # Library Service:
 
-Overview
-A Django-based web application for managing book borrowings and inventory in a local library. 
-Features include book CRUD operations, user authentication, borrowing tracking, Stripe payments integration, Telegram notifications, and comprehensive API documentation.
+A Django-based web application designed to manage book borrowings and inventory for a local library. Key features include:
+
+- Full book CRUD operations (Create, Read, Update, Delete)
+- User authentication and role-based access
+- Borrowing and return tracking system
+- Stripe integration for online payments
+- Telegram notifications for overdue or upcoming return reminders
+- Comprehensive API documentation for seamless integration and usage
 
 ## Installation
 #### Docker 
